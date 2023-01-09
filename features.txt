@@ -1,0 +1,16 @@
+OPEN AI API
+Google API
+Spotify API
+8 Ball API
+IDevision API
+LinkedIn API
+
+.userinfo, .uinfo
+.meetup
+.meetupinfo .mi
+{
+  Date: 1/31/23
+  Location: 13/32/23
+}
+
+Murder Mystery Party
