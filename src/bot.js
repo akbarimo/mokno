@@ -1,6 +1,9 @@
-import dotenv from 'dotenv';
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
-import axios from 'axios';
+require('dotenv').config();
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const axios = require('axios');
+const functions = require('./modules/functions');
+const commands = require('./commands');
+const tasks = require('./modules/tasks');
 
 const client = new Client({
   intents: [
@@ -10,43 +13,44 @@ const client = new Client({
   ],
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
-
-client.once('ready', () => {
-  console.log(`Bot logged in as ${client.user.tag}`);
-});
+const handleInteraction = async (interaction) => {
+  console.log(interaction.commandName);
+  interaction.commandName = 'google';
+  try {
+    const response = await tasks[interaction.commandName](interaction);
+    await functions[interaction.commandName](interaction);
+    interaction.editReply({
+      embeds: [commands[interaction.commandName](interaction, response)],
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 client.on('interactionCreate', (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
-  if (interaction.commandName === 'ping') {
-    const time = Date.now();
-    interaction.reply('Pong').then(() => {
-      const elapsedTime = Date.now() - time;
-
-      interaction.editReply(`Pong! ${elapsedTime}ms`);
-    });
-  } else if (interaction.commandName === 'ask') {
-    interaction.reply('Asking Google...');
-    axios
-      .get('https://www.googleapis.com/customsearch/v1', {
-        params: {
-          q: interaction.options._hoistedOptions[0].value,
-          key: process.env.GOOGLE_API,
-          cx: process.env.GOOGLE_CX,
-        },
-      })
-      .then((response) => {
-        interaction.editReply(response.data.items[0].link);
+  interaction.reply('Thinking...').then(() => {
+    if (interaction.commandName === 'ping') {
+      const time = Date.now();
+      interaction.editReply('Pong').then(() => {
+        const elapsedTime = Date.now() - time;
+        interaction.editReply(`Pong! ${elapsedTime}ms`);
       });
-  }
+    } else {
+      handleInteraction(interaction);
+    }
+  });
 });
 
 client
   .login(process.env.BOT_SECRET)
-  .then(() => {})
+  .then(() => {
+    console.log(`Bot logged in as ${client.user.tag}`);
+    client.user.setPresence({
+      activities: [{ name: '/help', type: ActivityType.Listening }],
+      status: 'online',
+    });
+  })
   .catch((err) => {
     console.error(err);
   });

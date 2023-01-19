@@ -1,9 +1,5 @@
-import { REST, Routes, ApplicationCommandOptionType } from 'discord.js';
-import dotenv from 'dotenv';
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+require('dotenv').config();
+const { REST, Routes, ApplicationCommandOptionType } = require('discord.js');
 
 const rest = new REST({ version: '10' }).setToken(process.env.BOT_SECRET);
 
@@ -13,7 +9,7 @@ const commands = [
     description: 'Replies with bot ping',
   },
   {
-    name: 'ask',
+    name: 'google',
     description: 'Ask google a question',
     options: [
       {
