@@ -13,9 +13,9 @@ module.exports = async (interaction) => {
         },
       },
     );
-    return Promise.resolve(response);
+    return response;
   } catch (err) {
     console.error(err);
-    return Promise.reject(err);
+    return err;
   }
 };
