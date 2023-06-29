@@ -43,6 +43,10 @@ const handleInteraction = async (interaction) => {
   }
 };
 
+client.on('error', (err) => {
+  process.exit(0);
+});
+
 client.on('interactionCreate', (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   interaction.reply('Thinking...').then(() => {
